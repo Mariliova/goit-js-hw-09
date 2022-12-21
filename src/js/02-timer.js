@@ -30,7 +30,7 @@ flatpickr(refs.datetimePicker, options);
 function onCloseInput(selectedDates) {
   if (selectedDates[0] <= options.defaultDate) {
     window.alert('Please choose a date in the future');
-    refs.start.setAttribute('disabled', 'true');
+    // refs.start.setAttribute('disabled', 'true');
     return;
   }
 
@@ -49,8 +49,6 @@ function onCloseInput(selectedDates) {
     }, DELAY);
   });
 }
-
-// =========
 
 function convertMs(ms) {
   const second = 1000;
