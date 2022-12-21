@@ -35,12 +35,14 @@ function onCloseInput(selectedDates) {
   }
 
   refs.start.removeAttribute('disabled');
-  randerTimer(convertMs(selectedDates[0] - options.defaultDate));
+  const timerData = convertMs(selectedDates[0] - options.defaultDate);
+  randerTimer(timerData);
 
   refs.start.addEventListener('click', () => {
     intervalId = setInterval(() => {
-      const data = randerTimer(convertMs(selectedDates[0] - new Date()));
-      const isToStop = checkIfStop(data);
+      const timerData = convertMs(selectedDates[0] - new Date());
+      const dataToChack = randerTimer(timerData);
+      const isToStop = checkIfStop(dataToChack);
       if (isToStop) {
         clearInterval(intervalId);
       }
