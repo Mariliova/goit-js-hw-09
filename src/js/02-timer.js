@@ -42,8 +42,8 @@ function onCloseInput(selectedDates) {
   refs.start.addEventListener('click', () => {
     intervalId = setInterval(() => {
       const timerData = convertMs(selectedDates[0] - new Date());
-      const dataToChack = randerTimer(timerData);
-      const isToStop = checkIfStop(dataToChack);
+      const dataToCheck = randerTimer(timerData);
+      const isToStop = checkIfStop(dataToCheck);
       if (isToStop) {
         clearInterval(intervalId);
       }
