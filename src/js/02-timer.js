@@ -12,9 +12,6 @@ const refs = {
   seconds: document.querySelector('[data-seconds]'),
 };
 
-const DELAY = 1000;
-let intervalId = null;
-
 const options = {
   enableTime: true,
   time_24hr: true,
@@ -25,30 +22,63 @@ const options = {
   },
 };
 
+const DELAY = 1000;
+let intervalId = null;
+let selectedDate = null;
+
+refs.start.addEventListener('click', onStartClisk);
+
 refs.start.setAttribute('disabled', 'true');
 
 flatpickr(refs.datetimePicker, options);
 
 function onCloseInput(selectedDates) {
-  if (selectedDates[0] <= options.defaultDate) {
+  selectedDate = selectedDates[0];
+
+  if (selectedDate <= options.defaultDate) {
     Notify.failure('Please choose a date in the future');
     return;
   }
 
   refs.start.removeAttribute('disabled');
-  const timerData = convertMs(selectedDates[0] - options.defaultDate);
-  randerTimer(timerData);
+  const ms = selectedDate - options.defaultDate;
+  buildTimer(ms);
+}
 
-  refs.start.addEventListener('click', () => {
-    intervalId = setInterval(() => {
-      const timerData = convertMs(selectedDates[0] - new Date());
-      const dataToCheck = randerTimer(timerData);
-      const isToStop = checkIfStop(dataToCheck);
-      if (isToStop) {
-        clearInterval(intervalId);
-      }
-    }, DELAY);
-  });
+function onStartClisk() {
+  if (selectedDate <= new Date()) {
+    Notify.failure(
+      'Selected date has expired. Please choose a date in the future'
+    );
+    refs.start.setAttribute('disabled', 'true');
+    const ms = 0;
+    buildTimer(ms);
+    return;
+  }
+
+  refs.start.setAttribute('disabled', 'true');
+  refs.datetimePicker.setAttribute('disabled', 'true');
+
+  intervalId = setInterval(() => {
+    const ms = selectedDate - new Date();
+    if (ms <= 1000) {
+      refs.datetimePicker.removeAttribute('disabled');
+      clearInterval(intervalId);
+    }
+    buildTimer(ms);
+  }, DELAY);
+}
+
+function buildTimer(ms) {
+  const timerData = convertMs(ms);
+  randerTimer(timerData);
+}
+
+function randerTimer({ days, hours, minutes, seconds }) {
+  refs.days.innerHTML = addLeadingZero(days);
+  refs.hours.innerHTML = addLeadingZero(hours);
+  refs.minutes.innerHTML = addLeadingZero(minutes);
+  refs.seconds.innerHTML = addLeadingZero(seconds);
 }
 
 function convertMs(ms) {
@@ -65,20 +95,6 @@ function convertMs(ms) {
   return { days, hours, minutes, seconds };
 }
 
-function randerTimer({ days, hours, minutes, seconds }) {
-  refs.days.innerHTML = addLeadingZero(days);
-  refs.hours.innerHTML = addLeadingZero(hours);
-  refs.minutes.innerHTML = addLeadingZero(minutes);
-  refs.seconds.innerHTML = addLeadingZero(seconds);
-  return { days, hours, minutes, seconds };
-}
-
 function addLeadingZero(value) {
   return value.toString().padStart(2, '0');
-}
-
-function checkIfStop({ days, hours, minutes, seconds }) {
-  if (days === 0 && hours === 0 && minutes === 0 && seconds === 0) {
-    return true;
-  }
 }
